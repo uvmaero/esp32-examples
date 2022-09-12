@@ -76,7 +76,7 @@ void setup()
 void loop()
 {
   // print timer interrupt counts 
-  Serial.printf("timer counts:\n 0: %d | 1: %d | 2: %d | 3: %d\r", timer0Count, timer1Count, timer2Count, timer3Count);
+  Serial.printf("timer 0 (0.5 sec): %d | timer 1 (1 sec): %d | timer 2 (2 sec): %d |  timer 3 (5 sec): %d\r", timer0Count, timer1Count, timer2Count, timer3Count);
 }
 
 
