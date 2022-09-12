@@ -11,7 +11,7 @@
 
 
 // --- defines --- // 
-#define TIMER_INTERRUPT_PRESCALER       80          // this is based off to the clock speed (assuming 80 MHz), gets us to microseconds
+#define TIMER_INTERRUPT_PRESCALER       80          // this is based off to the clock speed (assuming 80 MHz)
 #define TIMER_0_INTERVAL                500000      // 0.5 seconds in microseconds
 #define TIMER_1_INTERVAL                1000000     // 1 second in microseconds
 #define TIMER_2_INTERVAL                2000000     // 2 second in microseconds
@@ -30,6 +30,7 @@ hw_timer_t* timer2 = NULL;
 hw_timer_t* timer3 = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
+// timer counters, to keep track of how many times an ISR has been called
 int timer0Count = 0;
 int timer1Count = 0;
 int timer2Count = 0;
@@ -46,10 +47,10 @@ void printMessage3();
 // --- setup --- // 
 void setup()
 {
-  // initialize serial
+  // initialize serial connection for the serial monitor & debugging
   Serial.begin(9600);
 
-  // initialize timer interrupts
+  // initialize timer interrupts 0 - 3
   timer0 = timerBegin(0, TIMER_INTERRUPT_PRESCALER, true);
   timerAttachInterrupt(timer0, &printMessage0, true);
   timerAlarmWrite(timer0, TIMER_0_INTERVAL, true);
@@ -86,10 +87,12 @@ void loop()
  */
 void printMessage0() 
 {
+  // disable interrupts
   portENTER_CRITICAL_ISR(&timerMux);
   
   timer0Count++;
 
+  // re-enable interrupts
   portEXIT_CRITICAL_ISR(&timerMux);
 }
 
@@ -100,10 +103,12 @@ void printMessage0()
  */
 void printMessage1() 
 {
+  // disable interrupts
   portENTER_CRITICAL_ISR(&timerMux);
   
   timer1Count++;
 
+  // re-enable interrupts
   portEXIT_CRITICAL_ISR(&timerMux);
 }
 
@@ -114,10 +119,12 @@ void printMessage1()
  */
 void printMessage2() 
 {
+  // disable interrupts
   portENTER_CRITICAL_ISR(&timerMux);
   
   timer2Count++;
 
+  // disare-enableble interrupts
   portEXIT_CRITICAL_ISR(&timerMux);
 }
 
@@ -128,9 +135,11 @@ void printMessage2()
  */
 void printMessage3() 
 {
+  // disable interrupts
   portENTER_CRITICAL_ISR(&timerMux);
   
   timer3Count++;
 
+  // re-enable interrupts
   portEXIT_CRITICAL_ISR(&timerMux);
 }
