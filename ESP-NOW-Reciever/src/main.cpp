@@ -34,7 +34,7 @@ struct DataStruct
 DataStruct data;
 
 // ESP-Now Connection
-uint8_t deviceMacAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xA2};
+uint8_t deviceMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};
 
 
 // --- function headers --- //
@@ -46,6 +46,7 @@ void setup()
 {
   // initialize serial connection for the serial monitor & debugging
   Serial.begin(9600);
+  Serial.println("Serial Initalized!");
 
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
@@ -66,15 +67,13 @@ void setup()
 void loop()
 {
   // print updated data
-  Serial.printf("messages received: %d\r", messageCounter);
-  Serial.println("");
-  Serial.printf("message size: %d\r", messageLength);
-  Serial.println("");
-  Serial.printf("Button State: %s\r", data.buttonState ? "pressed" : "not pressed");
-  Serial.println("");
-  Serial.printf("Loop Counter: %d\r", data.counterLoop);
-  Serial.println("");
-  Serial.printf("Timer Counter: %d", data.counterTimer0);
+  Serial.printf("DEVICE MAC ADDRESS: ");
+  Serial.println(WiFi.macAddress());
+  // Serial.printf("messages received: %d\r", messageCounter);
+  // Serial.printf("message size: %d\r", messageLength);
+  // Serial.printf("Button State: %s\r", data.buttonState ? "pressed" : "not pressed");
+  // Serial.printf("Loop Counter: %d\r", data.counterLoop);
+  // Serial.printf("Timer Counter: %d", data.counterTimer0);
 }
 
 
