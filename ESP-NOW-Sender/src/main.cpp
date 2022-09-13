@@ -1,7 +1,7 @@
 /**
  * @file main.cpp
  * @author dominic gasperini
- * @brief example file for using timers on the esp32-wroom on the espressif dev module
+ * @brief example file for using ESP-NOW, with this device acting as the sender of a message
  * @version 0.1
  * @date 2022-09-12
  * 
