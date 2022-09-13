@@ -169,9 +169,9 @@ void onDataSent(const uint8_t* macAddress, esp_now_send_status_t status) {
 /**
  * @brief Formats MAC Address
  * 
- * @param macAddr 
- * @param buffer 
- * @param maxLength 
+ * @param macAddress the mac address to be converted
+ * @param buffer the string buffer
+ * @param maxLength the max length the output can be
  */
 void formatMacAddress(const uint8_t *macAddress, char *buffer, int maxLength)
 {
