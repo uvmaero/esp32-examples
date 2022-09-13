@@ -39,7 +39,7 @@ DataStruct data;
 
 // ESP-Now Connection
 uint8_t deviceMacAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xA1};
-uint8_t targetMacAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};       // change this to the target address!
+uint8_t targetMacAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xA2};       // change this to the target address!
 esp_now_peer_info reciverInfo;
 
 
