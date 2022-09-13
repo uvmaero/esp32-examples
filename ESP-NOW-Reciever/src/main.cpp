@@ -67,13 +67,11 @@ void setup()
 void loop()
 {
   // print updated data
-  Serial.printf("DEVICE MAC ADDRESS: ");
-  Serial.println(WiFi.macAddress());
-  // Serial.printf("messages received: %d\r", messageCounter);
-  // Serial.printf("message size: %d\r", messageLength);
-  // Serial.printf("Button State: %s\r", data.buttonState ? "pressed" : "not pressed");
-  // Serial.printf("Loop Counter: %d\r", data.counterLoop);
-  // Serial.printf("Timer Counter: %d", data.counterTimer0);
+  Serial.printf("messages received: %d\r", messageCounter);
+  Serial.printf("message size: %d\r", messageLength);
+  Serial.printf("Button State: %s\r", data.buttonState ? "pressed" : "not pressed");
+  Serial.printf("Loop Counter: %d\r", data.counterLoop);
+  Serial.printf("Timer Counter: %d", data.counterTimer0);
 }
 
 
