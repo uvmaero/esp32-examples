@@ -23,6 +23,8 @@
 // --- global variables --- //
 int messageCounter = 0;
 int messageLength = 0;
+uint8_t recievedAddress = 0;
+
 
 // data struct
 struct DataStruct
@@ -33,7 +35,7 @@ struct DataStruct
 } data; 
 
 // ESP-Now Connection
-uint8_t deviceMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t deviceMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};    // 90:38:0C:EA:D7:60
 
 
 // --- function headers --- //
@@ -66,6 +68,9 @@ void setup()
 void loop()
 {
   // print updated data
+  Serial.print("DEVICE MAC ADDRESS: ");
+  Serial.println(WiFi.macAddress());
+  Serial.printf("FROM: %d\n", recievedAddress);
   Serial.printf("messages received: %d\n", messageCounter);
   Serial.printf("message size: %d\n", messageLength);
   Serial.printf("Button State: %s\n", data.buttonState ? "pressed" : "not pressed");
@@ -91,4 +96,5 @@ void loop()
   // update message trackers
   messageCounter++;
   messageLength = len;
+  recievedAddress = *mac;
 }

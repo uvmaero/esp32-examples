@@ -34,17 +34,17 @@ struct DataStruct
   int counterTimer0 = 0;
   int counterLoop = 0;
   bool buttonState = false;
-}; 
-DataStruct data;
+} data; 
 
 // ESP-Now Connection
-uint8_t deviceMacAddress[] = {0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t deviceMacAddress[] = {0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};       // 90:38:0C:EA:D7:60
 uint8_t targetMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};       // change this to the target address!
-esp_now_peer_info reciverInfo;
+esp_now_peer_info targetInfo;
 
 
 // --- function headers --- //
 void sendData();
+void onDataSent();
 void timer0ISR();
 
 
@@ -74,12 +74,12 @@ void setup()
   Serial.printf("ESP-NOW INIT [ %s ]\n", initResult == ESP_OK ? "SUCCESS" : "FAILED");
   
   // get peer informtion about reciver
-  memcpy(reciverInfo.peer_addr, targetMacAddress, sizeof(targetMacAddress));
-  reciverInfo.channel = 0;
-  reciverInfo.encrypt = false;
+  memcpy(targetInfo.peer_addr, targetMacAddress, 6);
+  targetInfo.channel = 0;
+  targetInfo.encrypt = false;
 
   // add receiver as a peer
-  esp_err_t peerConnectionResult = esp_now_add_peer(&reciverInfo);
+  esp_err_t peerConnectionResult = esp_now_add_peer(&targetInfo);
   Serial.printf("ESP-NOW PEER CONNECTION [ %s ]\n", peerConnectionResult == ESP_OK ? "SUCCESS" : "FAILED");
 }
 
@@ -108,7 +108,16 @@ void sendData()
   esp_err_t result = esp_now_send(targetMacAddress, (uint8_t *) &data, sizeof(data));
 
   // print result
-  Serial.printf("Message Send Status [ %s ]\n", result == ESP_OK ? "SUCCESS" : "FAILED");
+  Serial.print("DEVICE MAC ADDRESS: ");
+  Serial.println(WiFi.macAddress());
+  Serial.printf("Message Send [ %s ]\n", result == ESP_OK ? "SUCCESS" : "FAILED");
+}
+
+
+// Callback function called when data is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
 
