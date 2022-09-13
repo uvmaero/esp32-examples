@@ -30,8 +30,7 @@ struct DataStruct
   int counterTimer0 = 0;
   int counterLoop = 0;
   bool buttonState = false;
-}; 
-DataStruct data;
+} data; 
 
 // ESP-Now Connection
 uint8_t deviceMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -50,8 +49,8 @@ void setup()
 
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
-  WiFi.mode(WIFI_STA);
   esp_wifi_set_mac(WIFI_IF_STA, &deviceMacAddress[0]);
+  WiFi.mode(WIFI_STA);
   Serial.printf("DEVICE MAC ADDRESS: %s\n", WiFi.macAddress());
 
   // init ESP-NOW service
@@ -67,11 +66,14 @@ void setup()
 void loop()
 {
   // print updated data
-  Serial.printf("messages received: %d\r", messageCounter);
-  Serial.printf("message size: %d\r", messageLength);
-  Serial.printf("Button State: %s\r", data.buttonState ? "pressed" : "not pressed");
-  Serial.printf("Loop Counter: %d\r", data.counterLoop);
-  Serial.printf("Timer Counter: %d", data.counterTimer0);
+  Serial.printf("messages received: %d\n", messageCounter);
+  Serial.printf("message size: %d\n", messageLength);
+  Serial.printf("Button State: %s\n", data.buttonState ? "pressed" : "not pressed");
+  Serial.printf("Loop Counter: %d\n", data.counterLoop);
+  Serial.printf("Timer Counter: %d\n", data.counterTimer0);
+  Serial.println("--------------------------------------------------------------------------------");
+
+  delay(1000);
 }
 
 
@@ -81,8 +83,7 @@ void loop()
  * @param mac 
  * @param incomingData 
  * @param len 
- */
-void onDataArrived(const uint8_t * mac, const uint8_t *incomingData, int len)
+ */void onDataArrived(const uint8_t * mac, const uint8_t *incomingData, int len)
 {
   // copy the data to the local data structure
   memcpy(&data, incomingData, sizeof(data));
