@@ -19,6 +19,7 @@
 // --- includes --- // 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 #include <esp_now.h>
 
 
@@ -33,16 +34,17 @@ struct DataStruct
   int counterTimer0 = 0;
   int counterLoop = 0;
   bool buttonState = false;
-} data;
+}; 
+DataStruct data;
 
 // ESP-Now Connection
-uint8_t recivingAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};       // change this to the mac address of the reciever
+uint8_t deviceMacAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xA1};
+uint8_t targetMacAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};       // change this to the target address!
 esp_now_peer_info reciverInfo;
 
 
 // --- function headers --- //
 void sendData();
-void dataSent(const uint8_t* macAddress, esp_now_send_status_t status);
 void timer0ISR();
 
 
@@ -64,13 +66,15 @@ void setup()
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
   WiFi.mode(WIFI_STA);
+  esp_wifi_set_mac(WIFI_IF_STA, &deviceMacAddress[0]);
+  Serial.printf("DEVICE MAC ADDRESS: %s\n", WiFi.macAddress());
 
   // init ESP-NOW service
   esp_err_t initResult = esp_now_init();
   Serial.printf("ESP-NOW INIT [ %s ]\n", initResult == ESP_OK ? "SUCCESS" : "FAILED");
   
   // get peer informtion about reciver
-  memcpy(reciverInfo.peer_addr, recivingAddress, sizeof(recivingAddress));
+  memcpy(reciverInfo.peer_addr, targetMacAddress, sizeof(targetMacAddress));
   reciverInfo.channel = 0;
   reciverInfo.encrypt = false;
 
@@ -101,7 +105,7 @@ void loop()
 void sendData()
 {
   // send message
-  esp_err_t result = esp_now_send(recivingAddress, (uint8_t *) &data, sizeof(data));
+  esp_err_t result = esp_now_send(targetMacAddress, (uint8_t *) &data, sizeof(data));
 
   // print result
   Serial.printf("Message Send Status [ %s ]\n", result == ESP_OK ? "SUCCESS" : "FAILED");
