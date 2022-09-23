@@ -24,4 +24,4 @@ Now that you've opened the PlatformIO project, we can look around the code and b
 ). 
 
 ## Step 4 - Develop!:
-So you've got some examples up and running on esp32 development boards? Congrats! That's pretty good, but it's time to start making some changes of your own! I you want to modify an example, you can create new branch of the esp32-example repository, this way, others can see your edits and follow along with your more complex expansions! Remember, the Team Leaders are always here to help, if you come across any problems, just ask for help! We all had to start somewhere! 
+So you've got some examples up and running on esp32 development boards? Congrats! That's pretty good, but it's time to start making some changes of your own! I you want to modify an example, you can create new branch of the esp32-example repository, this way, others can see your edits and follow along with your more complex expansions! Checkout the Tutorials repository for some resources on how to create a new branch if you're not sure how! Remember, the Team Leaders are always here to help, if you come across any problems, just ask for help! We all had to start somewhere! 
