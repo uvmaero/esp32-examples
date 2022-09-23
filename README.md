@@ -13,7 +13,9 @@ Outlined below are steps you can follow to successfully obtain and use the examp
 First, clone the esp32-examples repository down from Github, this can be done in various ways. It's up to you to decide how you want to manage your repositories, either via Github Desktop, terminal access, through VS Code, or any combination of those. If you need help with cloning a repository or would like to learn how, check out the Tutorials Repository for guides and Github practice! 
 
 ## Step 2 - Open the Project:
-To open your freshly cloned project, open the "Home" tab of the PlatformIO extension. The "Home" tab has many options and submenus, but for now press the "Open Project" button, and navigate to where you have cloned your esp32-examples repository. From here you can select which project you would like to open. If you have the oppurtunity, take some time to poke around the PlatformIO
+To open your freshly cloned project, open the "Home" tab of the PlatformIO extension. The "Home" tab has many options and submenus, but for now press the "Open Project" button, and navigate to where you have cloned your esp32-examples repository. From here you can select which project you would like to open. If you have the oppurtunity, take some time to poke around the PlatformIO menus and checkout all the cool features!
+![image](https://user-images.githubusercontent.com/38026244/191998403-4b683be1-7c36-46f5-988c-69a8d9361b54.png)
+
 
 ## Step 3 - Build & Run: 
 Now that you've opened the PlatformIO project, we can look around the code and browse files. But all the examples should be functional right out of the box, lucky you! To ensure to code complies, you can press the built-in "Build" button (the small checkmark button ![image](https://user-images.githubusercontent.com/38026244/191997835-09313f40-032f-4b2c-af69-8039da36c53b.png)
