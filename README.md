@@ -1,4 +1,4 @@
-# esp32-examples
+# Welcome to esp32-examples! :)
 Examples of different features and functions specific to the ESP32 on the Arduino framework. Each of the sub-folders contains a PlatformIO project
 with the example code and all of nessecary dependencies. I encourage you to explore how each of the different examples works, and how they can be used together to create more complex functionality!
 
