@@ -33,9 +33,6 @@ struct DataStruct
   bool buttonState = false;
 } data; 
 
-// ESP-Now Connection
-uint8_t deviceMacAddress[] = {0xC4, 0xDE, 0xE2, 0xC0, 0x75, 0x80};
-
 
 // --- function headers --- //
 void onDataArrived(const uint8_t * mac, const uint8_t *incomingData, int len);
@@ -50,7 +47,6 @@ void setup()
 
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
-  esp_wifi_set_mac(WIFI_IF_STA, &deviceMacAddress[0]);
   WiFi.mode(WIFI_STA);
   Serial.printf("DEVICE MAC ADDRESS: %s\n", WiFi.macAddress());
 
