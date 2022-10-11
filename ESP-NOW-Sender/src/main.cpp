@@ -37,7 +37,7 @@ struct DataStruct
 } data; 
 
 // ESP-Now Connection
-uint8_t deviceMacAddress[] = {0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};       // 90:38:0C:EA:D7:60
+// MAC Address: 90:38:0C:EA:D7:60
 uint8_t targetMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};       // change this to the target address!
 esp_now_peer_info targetInfo;
 
@@ -66,7 +66,7 @@ void setup()
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
   WiFi.mode(WIFI_STA);
-  esp_wifi_set_mac(WIFI_IF_STA, &deviceMacAddress[0]);
+  // esp_wifi_set_mac(WIFI_IF_STA, &deviceMacAddress[0]);
   Serial.printf("DEVICE MAC ADDRESS: %s\n", WiFi.macAddress());
 
   // init ESP-NOW service
