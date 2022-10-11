@@ -6,7 +6,6 @@
  * @date 2022-09-12
  * 
  * @copyright Copyright (c) 2022
- * 
  */
 
 
@@ -35,7 +34,7 @@ struct DataStruct
 } data; 
 
 // ESP-Now Connection
-uint8_t deviceMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};    // 90:38:0C:EA:D7:60
+uint8_t deviceMacAddress[] = {0xC4, 0xDE, 0xE2, 0xC0, 0x75, 0x80};
 
 
 // --- function headers --- //
