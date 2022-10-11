@@ -8,7 +8,7 @@
 
 
 // --- defines --- // 
-#define LED_PIN     3          // this is the physical pin the LED is attached to
+#define LED_PIN     4          // this is the GPIO pin the LED is attached to
 
 
 // --- includes --- // 
