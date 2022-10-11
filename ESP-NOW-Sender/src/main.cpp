@@ -38,7 +38,7 @@ struct DataStruct
 
 // ESP-Now Connection
 // MAC Address: 90:38:0C:EA:D7:60
-uint8_t targetMacAddress[] = {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF};       // change this to the target address!
+uint8_t targetMacAddress[] = {0x90, 0x38, 0x0C, 0xEA, 0xD7, 0x60};       // change this to the target address!
 esp_now_peer_info targetInfo;
 
 
