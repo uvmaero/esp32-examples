@@ -35,7 +35,7 @@ struct DataStruct
 } data; 
 
 // ESP-Now Connection C0:49:EF:46:23:B8
-uint8_t targetMacAddress[] = {0xC0, 0x49, 0xEF, 0x46, 0x23, 0xB8};       // change this to the mac address of your target device
+uint8_t targetMacAddress[] = {0xC4, 0xDE, 0xE2, 0xC0, 0x75, 0x80};       // change this to the mac address of your target device
 
 
 // --- function headers --- //
@@ -68,7 +68,6 @@ void setup()
 
   // setup ESP-NOW connections
   esp_now_register_recv_cb(onDataReceived);
-  esp_now_register_send_cb(onDataSent);
 }
 
 
@@ -100,41 +99,6 @@ void sendBroadcast()
   // send broadcast
   esp_err_t broadcastResult = esp_now_send(targetMacAddress, (const uint8_t*) &data, sizeof(data));
 
-  // print any sort or error messages we might get
-  switch (broadcastResult)
-  {
-    case ESP_OK:
-    Serial.println("Broadcast Successful");
-    break;
-
-    case ESP_ERR_ESPNOW_NOT_INIT:
-    Serial.println("ESP-NOW not Init.");
-    break;
-  
-    case ESP_ERR_ESPNOW_ARG:
-    Serial.println("Invalid Argument");
-    break;
-
-    case ESP_ERR_ESPNOW_INTERNAL:
-    Serial.println("Internal Error");
-    break; 
-
-    case ESP_ERR_ESPNOW_NO_MEM:
-    Serial.println("ESP_ERR_ESPNOW_NO_MEM");
-    break;
-    case ESP_ERR_ESPNOW_NOT_FOUND:
-    Serial.println("Peer not found.");
-    break;
-
-    default:
-    Serial.println("Unknown error");
-    break;
-  }
-
-  // print result
-  Serial.print("DEVICE MAC ADDRESS: ");
-  Serial.println(WiFi.macAddress());
-
   // re-enable interrupts
   portEXIT_CRITICAL_ISR(&timerMux);
 }
@@ -149,6 +113,9 @@ void sendBroadcast()
  */
 void onDataReceived(const uint8_t* macAddress, const uint8_t* incomingData, int dataLength)
 {
+  // disable interrupts
+  portENTER_CRITICAL_ISR(&timerMux);
+
   // copy incoming data into the local data structure
   memcpy(&data, incomingData, sizeof(incomingData));
 
@@ -156,18 +123,9 @@ void onDataReceived(const uint8_t* macAddress, const uint8_t* incomingData, int 
   char macStr[18];
   formatMacAddress(macAddress, macStr, 18);
   Serial.printf("Received message from: %s\n", macStr);
-}
 
-
-/**
- * @brief message sent callback function 
- * 
- * @param mac_addr the mac address of the broadcast device
- * @param status the status of message sent success
- */
-void onDataSent(const uint8_t* macAddress, esp_now_send_status_t status) {
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  // re-enable interrupts
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
 
 
