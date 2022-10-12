@@ -52,10 +52,10 @@ void setup()
   Serial.begin(9600);
 
   // initialize timer 0
-  // timer0 = timerBegin(0, TIMER_INTERRUPT_PRESCALER, true);
-  // timerAttachInterrupt(timer0, &sendBroadcast, true);
-  // timerAlarmWrite(timer0, TIMER_0_INTERVAL, true);
-  // timerAlarmEnable(timer0);
+  timer0 = timerBegin(0, TIMER_INTERRUPT_PRESCALER, true);
+  timerAttachInterrupt(timer0, &sendBroadcast, true);
+  timerAlarmWrite(timer0, TIMER_0_INTERVAL, true);
+  timerAlarmEnable(timer0);
 
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
@@ -89,6 +89,9 @@ void loop()
  */
 void sendBroadcast()
 {
+  // disable interrupts
+  portENTER_CRITICAL_ISR(&timerMux);
+
   // get peer information
   esp_now_peer_info_t peerInfo = {};
   memcpy(&peerInfo.peer_addr, targetMacAddress, 6);
@@ -134,6 +137,9 @@ void sendBroadcast()
   // print result
   Serial.print("DEVICE MAC ADDRESS: ");
   Serial.println(WiFi.macAddress());
+
+  // re-enable interrupts
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
 
 
