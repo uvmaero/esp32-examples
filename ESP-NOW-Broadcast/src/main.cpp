@@ -77,9 +77,6 @@ void loop()
 {
   // increment loop counter
   data.counterLoop += 2;
-  sendBroadcast();
-
-  delay(1000);
 }
 
 
