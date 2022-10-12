@@ -34,8 +34,8 @@ struct DataStruct
   int counterLoop = 0;
 } data; 
 
-// ESP-Now Connection
-uint8_t deviceMacAddress[] = {0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};       // 90:38:0C:EA:D7:60
+// ESP-Now Connection C0:49:EF:46:23:B8
+uint8_t targetMacAddress[] = {0xC0, 0x49, 0xEF, 0x46, 0x23, 0xB8};       // change this to the mac address of your target device
 
 
 // --- function headers --- //
@@ -52,15 +52,14 @@ void setup()
   Serial.begin(9600);
 
   // initialize timer 0
-  timer0 = timerBegin(0, TIMER_INTERRUPT_PRESCALER, true);
-  timerAttachInterrupt(timer0, &sendBroadcast, true);
-  timerAlarmWrite(timer0, TIMER_0_INTERVAL, true);
-  timerAlarmEnable(timer0);
+  // timer0 = timerBegin(0, TIMER_INTERRUPT_PRESCALER, true);
+  // timerAttachInterrupt(timer0, &sendBroadcast, true);
+  // timerAlarmWrite(timer0, TIMER_0_INTERVAL, true);
+  // timerAlarmEnable(timer0);
 
   // --- initialize ESP-NOW ---//
   // turn on wifi access point 
   WiFi.mode(WIFI_STA);
-  esp_wifi_set_mac(WIFI_IF_STA, &deviceMacAddress[0]);
   Serial.printf("DEVICE MAC ADDRESS: %s\n", WiFi.macAddress());
 
   // init ESP-NOW service
@@ -77,7 +76,10 @@ void setup()
 void loop()
 {
   // increment loop counter
-  data.counterLoop++;
+  data.counterLoop += 2;
+  sendBroadcast();
+
+  delay(1000);
 }
 
 
@@ -89,14 +91,14 @@ void sendBroadcast()
 {
   // get peer information
   esp_now_peer_info_t peerInfo = {};
-  memcpy(&peerInfo.peer_addr, deviceMacAddress, 6);
-  if (!esp_now_is_peer_exist(deviceMacAddress))
+  memcpy(&peerInfo.peer_addr, targetMacAddress, 6);
+  if (!esp_now_is_peer_exist(targetMacAddress))
   {
     esp_now_add_peer(&peerInfo);
   }
 
   // send broadcast
-  esp_err_t broadcastResult = esp_now_send(deviceMacAddress, (const uint8_t*) &data, sizeof(data));
+  esp_err_t broadcastResult = esp_now_send(targetMacAddress, (const uint8_t*) &data, sizeof(data));
 
   // print any sort or error messages we might get
   switch (broadcastResult)
