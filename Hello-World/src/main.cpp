@@ -21,8 +21,6 @@
 
 
 // --- setup --- // 
-#include <Arduino.h>
-
 void setup() {
   // initialize the serial monitor with a baud rate of 9600
   Serial.begin(9600);
