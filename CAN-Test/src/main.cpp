@@ -129,8 +129,8 @@ void CANCallback(void* args) {
   TaskHandle_t xHandle = NULL;
 
   // queue read and write tasks
-  xTaskCreate(CANWriteTask, "CAN-Update", configMINIMAL_STACK_SIZE, &ucParameterToPass, 5, &xHandle);
-  xTaskCreate(CANReadTask, "CAN-Update", configMINIMAL_STACK_SIZE, &ucParameterToPass, 5, &xHandle);
+  xTaskCreate(CANWriteTask, "CAN-Update", configMINIMAL_STACK_SIZE, &ucParameterToPass, 9, &xHandle);
+  xTaskCreate(CANReadTask, "CAN-Update", configMINIMAL_STACK_SIZE, &ucParameterToPass, 10, &xHandle);
 }
 
 
