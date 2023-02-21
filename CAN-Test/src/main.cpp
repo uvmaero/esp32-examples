@@ -26,8 +26,8 @@
 ===============================================================================================
 */
 
-#define CAN_TX_PIN                        21
-#define CAN_RX_PIN                        22
+#define CAN_TX_PIN                        23
+#define CAN_RX_PIN                        19
 #define MSG_ID                            0x555       // 11 bit standard format ID
 #define NUM_OF_MSGS                       10      
 
@@ -133,8 +133,8 @@ void CANCallback(void* args) {
   TaskHandle_t xHandle = NULL;
 
   // queue read and write tasks
-  xTaskCreate(CANWriteTask, "CAN-Write", configMINIMAL_STACK_SIZE, &ucParameterToPass, 9, &xHandle);
-  xTaskCreate(CANReadTask, "CAN-Read", configMINIMAL_STACK_SIZE, &ucParameterToPass, 10, &xHandle);
+  xTaskCreate(CANWriteTask, "CAN-Write", TASK_STACK_SIZE, &ucParameterToPass, 9, &xHandle);
+  xTaskCreate(CANReadTask, "CAN-Read", TASK_STACK_SIZE, &ucParameterToPass, 10, &xHandle);
 }
 
 
@@ -163,7 +163,25 @@ void CANWriteTask(void *arg)
   for (int i = 0; i < NUM_OF_MSGS; i++) {
     // transmit messages using self reception request
     tx_msg.data[0] = i;
-    ESP_ERROR_CHECK(can_transmit(&tx_msg, portMAX_DELAY));
+    int result = can_transmit(&tx_msg, portMAX_DELAY);
+    switch (result) {
+      case ESP_OK:
+        Serial.printf("Message Transmit Success!\n");
+      break;
+
+      case ESP_ERR_INVALID_STATE:
+        Serial.printf("ERROR: Invalid state!\n");
+      break;
+
+      case ESP_ERR_TIMEOUT:
+        Serial.printf("ERROR: Timeout!\n");
+      break;
+
+      default:
+          Serial.printf("ERROR: unhandled!\n");
+      break;
+    }
+
     vTaskDelay(pdMS_TO_TICKS(10));
   }
   
