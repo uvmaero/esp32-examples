@@ -32,7 +32,7 @@
 #define NUM_OF_MSGS                       10      
 
 #define CAN_UPDATE_INTERVAL               500000      // 0.5 seconds in microseconds
-#define TASK_STACK_SIZE                   2048
+#define TASK_STACK_SIZE                   4096        // in bytes
 #define MAIN_LOOP_DELAY                   1
 
 
@@ -43,7 +43,7 @@
 */
 
 // CAN Interface
-can_general_config_t canConfig = CAN_GENERAL_CONFIG_DEFAULT((gpio_num_t)CAN_TX_PIN, (gpio_num_t)CAN_RX_PIN, CAN_MODE_NORMAL);   // set pins controller will use
+can_general_config_t canConfig = CAN_GENERAL_CONFIG_DEFAULT((gpio_num_t)CAN_TX_PIN, (gpio_num_t)CAN_RX_PIN, CAN_MODE_NO_ACK);   // set pins controller will use
 can_timing_config_t canTimingConfig = CAN_TIMING_CONFIG_500KBITS();         // the timing of the CAN bus
 can_filter_config_t canFilterConfig = CAN_FILTER_CONFIG_ACCEPT_ALL();       // filter so we only receive certain messages
 
@@ -69,6 +69,7 @@ void CANWriteTask(void* pvParameters);
 */
 
 void setup() {
+  // start serial
   Serial.begin(9600);
 
   // delay startup by 5 seconds
@@ -95,21 +96,19 @@ void setup() {
     Serial.printf("CAN INIT [ FAILED ]\n");
   }
 
-  // --------------------- initialize timers -------------------------- //
+  // ------------------------ initialize timers ------------------------------- //
   // CAN Update
   const esp_timer_create_args_t timer1_args = {
     .callback = &CANCallback,
     .dispatch_method = ESP_TIMER_TASK,
-    .name = "CAN Read/Write Timer"
+    .name = "CAN Read-Write Timer"
   };
   esp_timer_handle_t timer1;
   ESP_ERROR_CHECK(esp_timer_create(&timer1_args, &timer1));
 
-  // start timer
+  // start CAN timer
   ESP_ERROR_CHECK(esp_timer_start_periodic(timer1, CAN_UPDATE_INTERVAL));
 }
-
-
 
 
 /*
@@ -125,11 +124,13 @@ void setup() {
  * @param args arguments to be passed to the task
  */
 void CANCallback(void* args) {
+  // init task parameters
   static uint8_t ucParameterToPass;
   TaskHandle_t xHandle = NULL;
-  xTaskCreate(CANWriteTask, "CAN-Update", TASK_STACK_SIZE, &ucParameterToPass, 5, &xHandle);
 
-  xTaskCreate(CANReadTask, "CAN-Update", TASK_STACK_SIZE, &ucParameterToPass, 5, &xHandle);
+  // queue read and write tasks
+  xTaskCreate(CANWriteTask, "CAN-Update", configMINIMAL_STACK_SIZE, &ucParameterToPass, 5, &xHandle);
+  xTaskCreate(CANReadTask, "CAN-Update", configMINIMAL_STACK_SIZE, &ucParameterToPass, 5, &xHandle);
 }
 
 
@@ -141,9 +142,9 @@ void CANCallback(void* args) {
 
 
 /**
- * @brief 
+ * @brief sends messages onto the can bus
  * 
- * @param arg 
+ * @param arg - argument passed via function pointer
  */
 void CANWriteTask(void *arg)
 {
@@ -156,10 +157,10 @@ void CANWriteTask(void *arg)
 
   // send messages
   for (int i = 0; i < NUM_OF_MSGS; i++) {
-      //Transmit messages using self reception request
-      tx_msg.data[0] = i;
-      ESP_ERROR_CHECK(can_transmit(&tx_msg, portMAX_DELAY));
-      vTaskDelay(pdMS_TO_TICKS(10));
+    // transmit messages using self reception request
+    tx_msg.data[0] = i;
+    ESP_ERROR_CHECK(can_transmit(&tx_msg, portMAX_DELAY));
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
   
   // end task
@@ -168,9 +169,9 @@ void CANWriteTask(void *arg)
 
 
 /**
- * @brief 
+ * @brief receives messages from the can bus
  * 
- * @param arg 
+ * @param arg - argument passed via function pointer
  */
 void CANReadTask(void *arg)
 {
@@ -179,9 +180,9 @@ void CANReadTask(void *arg)
 
   // receive messages
   for (int i = 0; i < NUM_OF_MSGS; i++) {
-      //Receive message and print message data
-      ESP_ERROR_CHECK(can_receive(&rx_message, portMAX_DELAY));
-      Serial.printf("Msg received - Data = %d", rx_message.data[0]);
+    // receive message and print message data
+    ESP_ERROR_CHECK(can_receive(&rx_message, portMAX_DELAY));
+    Serial.printf("Msg received - Data = %d", rx_message.data[0]);
   }
 
   // end task
@@ -196,6 +197,6 @@ void CANReadTask(void *arg)
 */
 
 void loop() {
-  // everything is managed by RTOS, so nothing really happens here!
-  vTaskDelay(MAIN_LOOP_DELAY);    // prevent watchdog from getting upset
+  // prevent watchdog from getting upset
+  vTaskDelay(MAIN_LOOP_DELAY);   
 }
