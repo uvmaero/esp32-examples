@@ -20,7 +20,6 @@
 #include "driver/can.h"
 
 
-
 /*
 ===============================================================================================
                                     Definitions
@@ -71,7 +70,7 @@ void CANWriteTask(void* pvParameters);
 
 void setup() {
   Serial.begin(9600);
-  
+
   // delay startup by 5 seconds
   vTaskDelay(5000);
 
