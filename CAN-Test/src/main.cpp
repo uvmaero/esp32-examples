@@ -71,6 +71,7 @@ void CANWriteTask(void* pvParameters);
 void setup() {
   // start serial
   Serial.begin(9600);
+  Serial.printf("\n\n|--- STARTING SETUP ---|\n\n");
 
   // delay startup by 5 seconds
   vTaskDelay(5000);
@@ -108,6 +109,9 @@ void setup() {
 
   // start CAN timer
   ESP_ERROR_CHECK(esp_timer_start_periodic(timer1, CAN_UPDATE_INTERVAL));
+
+  // end setup
+  Serial.printf("\n\n|--- END SETUP ---|\n\n");
 }
 
 
@@ -182,7 +186,7 @@ void CANReadTask(void *arg)
   for (int i = 0; i < NUM_OF_MSGS; i++) {
     // receive message and print message data
     ESP_ERROR_CHECK(can_receive(&rx_message, portMAX_DELAY));
-    Serial.printf("Msg received - Data = %d", rx_message.data[0]);
+    Serial.printf("Msg received - Data = %d\n", rx_message.data[0]);
   }
 
   // end task
