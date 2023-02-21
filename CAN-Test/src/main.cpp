@@ -69,12 +69,12 @@ void CANWriteTask(void* pvParameters);
 */
 
 void setup() {
+  // delay startup by 5 seconds
+  vTaskDelay(5000);
+
   // start serial
   Serial.begin(9600);
   Serial.printf("\n\n|--- STARTING SETUP ---|\n\n");
-
-  // delay startup by 5 seconds
-  vTaskDelay(5000);
 
   // --------------------- initialize CAN Controller -------------------------- //
   if (can_driver_install(&canConfig, &canTimingConfig, &canFilterConfig) == ESP_OK) {
