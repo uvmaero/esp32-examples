@@ -30,7 +30,7 @@
 #define FAN_ENABLE_PIN                    25
 #define BRAKE_LIGHT_ENABLE_PIN            26
 
-#define GPIO_UPDATE_INTERVAL              1000000     // 1 seconds in microseconds
+#define GPIO_UPDATE_INTERVAL              1500000     // 1.5 seconds in microseconds
 #define TASK_STACK_SIZE                   4096        // in bytes
 #define MAIN_LOOP_DELAY                   1
 
@@ -146,14 +146,6 @@ void GPIOCallback(void* args) {
  */
 void GPIOTask(void *arg)
 {
-  // update cycle counter
-  if (data.cycleCounter <= 4) {
-    data.cycleCounter++;
-  }
-  else {
-    data.cycleCounter = 1;
-  }
-
   // flip data states based on the cycle counter
   switch (data.cycleCounter) {
     case 1:
@@ -173,7 +165,7 @@ void GPIOTask(void *arg)
     break;
     
     default:
-      data.cycleCounter = 1;
+      data.cycleCounter = 0;
     break;
   }
 
@@ -185,6 +177,14 @@ void GPIOTask(void *arg)
   
   // print update
   Serial.printf("cycle: %d | imd: %d | bms: %d | fan: %d | brake: %d\r", data.cycleCounter, data.imdFaultActive, data.bmsFaultActive, data.fanEnableActive, data.brakeLightEnableActive);
+
+  // update cycle counter
+  if (data.cycleCounter >= 4) {
+    data.cycleCounter = 1;
+  }
+  else {
+    data.cycleCounter++;
+  }
 
   // end task
   vTaskDelete(NULL);
