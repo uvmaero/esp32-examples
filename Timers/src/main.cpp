@@ -2,8 +2,8 @@
  * @file main.cpp
  * @author dominic gasperini
  * @brief example file for using timers on the esp32-wroom on the espressif dev module
- * @version 0.1
- * @date 2022-09-12
+ * @version 1.0
+ * @date 2023-11-08
  * 
  * @copyright Copyright (c) 2022
  * 
@@ -11,11 +11,11 @@
 
 
 // --- defines --- // 
-#define TIMER_INTERRUPT_PRESCALER       80          // this is based off to the clock speed (assuming 80 MHz)
-#define TIMER_0_INTERVAL                500000      // 0.5 seconds in microseconds
-#define TIMER_1_INTERVAL                1000000     // 1 second in microseconds
-#define TIMER_2_INTERVAL                2000000     // 2 second in microseconds
-#define TIMER_3_INTERVAL                5000000     // 5 seconds in microseconds
+#define CLOCK_PRESCALER                 80          // this is based off to the clock speed (assuming 80 MHz)
+#define TIMER_1_INTERVAL                500000      // 0.5 seconds in microseconds
+#define TIMER_2_INTERVAL                1000000     // 1 second in microseconds
+#define TIMER_3_INTERVAL                2000000     // 2 second in microseconds
+#define TIMER_4_INTERVAL                5000000     // 5 seconds in microseconds
 
 
 // --- includes --- // 
@@ -32,66 +32,59 @@ int counter3 = 0;
 int counter4 = 0;
 
 
+// Hardware Timers
+hw_timer_t *timer1 = NULL;
+hw_timer_t *timer2 = NULL;
+hw_timer_t *timer3 = NULL;
+hw_timer_t *timer4 = NULL;
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+
+
 // --- function headers --- //
-static void callbackFunction1(void* arg);
-static void callbackFunction2(void* arg);
-static void callbackFunction3(void* arg);
-static void callbackFunction4(void* arg);
+void callbackFunction1();
+void callbackFunction2();
+void callbackFunction3();
+void callbackFunction4();
 
 
 // --- setup --- // 
 void setup()
 {
+  // startup delay
+  delay(3000);
+
   // initialize serial connection for the serial monitor & debugging
   Serial.begin(9600);
 
   // --- initialize timer interrupts --- //
-  // timer 1 - sensors 
-  const esp_timer_create_args_t timer1_args = {
-    .callback = &callbackFunction1,
-    .dispatch_method = ESP_TIMER_TASK,
-    .name = "timer 1"
-  };
-  esp_timer_handle_t timer1;
-  ESP_ERROR_CHECK(esp_timer_create(&timer1_args, &timer1));
 
-  // timer 2 - can write
-  const esp_timer_create_args_t timer2_args = {
-    .callback = callbackFunction2,
-    .dispatch_method = ESP_TIMER_TASK,
-    .name = "timer 2"
-  };
-  esp_timer_handle_t timer2;
-  ESP_ERROR_CHECK(esp_timer_create(&timer2_args, &timer2));
+  // timer 1 - Sensor Update
+  timer1 = timerBegin(0, CLOCK_PRESCALER, true);
+  timerAttachInterrupt(timer1, &callbackFunction1, true);
+  timerAlarmWrite(timer1, TIMER_1_INTERVAL, true);
 
-  // timer 3
-  const esp_timer_create_args_t timer3_args = {
-    .callback = callbackFunction3,
-    .dispatch_method = ESP_TIMER_TASK,
-    .name = "timer 3"
-  };
-  esp_timer_handle_t timer3;
-  ESP_ERROR_CHECK(esp_timer_create(&timer3_args, &timer3));
+  timer2 = timerBegin(1, CLOCK_PRESCALER, true);
+  timerAttachInterrupt(timer2, &callbackFunction2, true);
+  timerAlarmWrite(timer2, TIMER_2_INTERVAL, true);
 
-  // timer 4 - WCB update
-  const esp_timer_create_args_t timer4_args = {
-    .callback = callbackFunction4,
-    .dispatch_method = ESP_TIMER_TASK,
-    .name = "timer 4"
-  };
-  esp_timer_handle_t timer4;
-  ESP_ERROR_CHECK(esp_timer_create(&timer4_args, &timer4));
+  timer3 = timerBegin(2, CLOCK_PRESCALER, true);
+  timerAttachInterrupt(timer3, &callbackFunction3, true);
+  timerAlarmWrite(timer3, TIMER_3_INTERVAL, true);
+
+  timer4 = timerBegin(3, CLOCK_PRESCALER, true);
+  timerAttachInterrupt(timer4, &callbackFunction4, true);
+  timerAlarmWrite(timer4, TIMER_4_INTERVAL, true);
 
   // start timers
-  ESP_ERROR_CHECK(esp_timer_start_periodic(timer1, 500000));
-  ESP_ERROR_CHECK(esp_timer_start_periodic(timer2, 1000000));
-  ESP_ERROR_CHECK(esp_timer_start_periodic(timer3, 2000000));
-  ESP_ERROR_CHECK(esp_timer_start_periodic(timer4, 5000000));
+  timerAlarmEnable(timer1);
+  timerAlarmEnable(timer2);
+  timerAlarmEnable(timer3);
+  timerAlarmEnable(timer4);
 
-  ESP_LOGD(TAG, "Timer 1 INIT: %s\n", esp_timer_is_active(timer1) ? "ACTIVE" : "FAILED");
-  ESP_LOGD(TAG, "Timer 2 INIT: %s\n", esp_timer_is_active(timer2) ? "ACTIVE" : "FAILED");
-  ESP_LOGD(TAG, "Timer 3 INIT: %s\n", esp_timer_is_active(timer3) ? "ACTIVE" : "FAILED");
-  ESP_LOGD(TAG, "Timer 4 INIT: %s\n", esp_timer_is_active(timer4) ? "ACTIVE" : "FAILED");
+  Serial.printf("TIMER 1 STATUS: %s\n", timerAlarmEnabled(timer1) ? "RUNNING" : "DISABLED");
+  Serial.printf("TIMER 2 STATUS: %s\n", timerAlarmEnabled(timer2) ? "RUNNING" : "DISABLED");
+  Serial.printf("TIMER 3 STATUS: %s\n", timerAlarmEnabled(timer3) ? "RUNNING" : "DISABLED");
+  Serial.printf("TIMER 4 STATUS: %s\n", timerAlarmEnabled(timer4) ? "RUNNING" : "DISABLED");
 }
 
 
@@ -104,40 +97,56 @@ void loop()
 
 
 /**
- * @brief Timer 1 ISR - increments timer 0 count
+ * @brief Timer 1 ISR - increments timer 1 counter
  * 
  */
-static void callbackFunction1(void* arg) 
+void callbackFunction1() 
 {  
+  portENTER_CRITICAL_ISR(&timerMux);
+
   counter1++;
+
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
 
 
 /**
- * @brief Timer 2 ISR - increments timer 1 count
+ * @brief Timer 2 ISR - increments timer 2 counter
  * 
  */
-static void callbackFunction2(void* arg) 
+void callbackFunction2() 
 {  
+  portENTER_CRITICAL_ISR(&timerMux);
+
   counter2++;
+
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
 
 
 /**
- * @brief Timer 3 ISR - increments timer 2 count
+ * @brief Timer 3 ISR - increments timer 3 counter
  * 
  */
-static void callbackFunction3(void* arg) 
+void callbackFunction3() 
 {  
+  portENTER_CRITICAL_ISR(&timerMux);
+
   counter3++;
+
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
 
 
 /**
- * @brief Timer 4 ISR - increments timer 3 count
+ * @brief Timer 4 ISR - increments timer 4 counter
  * 
  */
-static void callbackFunction4(void* arg) 
+void callbackFunction4() 
 {  
+  portENTER_CRITICAL_ISR(&timerMux);
+
   counter4++;
+
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
