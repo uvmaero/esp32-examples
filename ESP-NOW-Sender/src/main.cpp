@@ -2,11 +2,8 @@
  * @file main.cpp
  * @author dominic gasperini
  * @brief example file for using ESP-NOW, with this device acting as the sender of a message
- * @version 0.1
+ * @version 1.0
  * @date 2022-09-12
- * 
- * @copyright Copyright (c) 2022
- * 
  */
 
 
@@ -38,7 +35,7 @@ struct DataStruct
 
 // ESP-Now Connection
 // MAC Address: 90:38:0C:EA:D7:60
-uint8_t targetMacAddress[] = {0xC0, 0x49, 0xEF, 0x46, 0x23, 0xB8};       // change this to the target address!
+uint8_t targetMacAddress[] = {0xE0, 0x5A, 0x1B, 0x15, 0xEC, 0x10};       // change this to the target address!
 esp_now_peer_info targetInfo;
 
 
@@ -95,6 +92,9 @@ void loop()
 
   // transmit updated message
   sendData();
+
+  // delay the sending of the next message
+  delay(1000);
 }
 
 
@@ -108,16 +108,14 @@ void sendData()
   esp_err_t result = esp_now_send(targetMacAddress, (uint8_t *) &data, sizeof(data));
 
   // print result
+  Serial.printf("\n\n-------------------\n");
   Serial.print("DEVICE MAC ADDRESS: ");
   Serial.println(WiFi.macAddress());
-  Serial.printf("Message Send [ %s ]\n", result == ESP_OK ? "SUCCESS" : "FAILED");
-}
 
+  Serial.printf("Counter: %d\n", data.counterLoop);
 
-// Callback function called when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  Serial.printf("Message Send Status [ %s ]\n", result == ESP_OK ? "SUCCESS" : "FAILED");
+  Serial.printf("-------------------\n");
 }
 
 
